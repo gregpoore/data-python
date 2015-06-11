@@ -1,0 +1,4 @@
+import numpy as np
+f=open("file.txt","r")
+x=readlines(f)[1:]
+print x

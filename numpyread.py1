@@ -1,0 +1,60 @@
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
+from sklearn.feature_selection import RFE
+from sklearn.linear_model import LogisticRegression
+from sklearn.cross_validation import train_test_split
+import csv
+import numpy as np
+import matplotlib.pyplot as plt
+f=np.genfromtxt(open("CAX_COPD_TRAIN_data.csv","rb"),delimiter=",",skiprows=1)
+#f=np.loadtxt(open("CAX_COPD_TRAIN_data.csv","rb"),delimiter=",",skiprows=1)
+print f.shape
+mat=np.matrix(f)
+Xtrain,Xcv,Xtrainind,Xcvind=train_test_split(mat[:,2:],range(np.size(mat,0)),test_size=0.33,random_state=42)
+#Xtrain=mat[:1100,2:]
+#ytrain=f[:1100,1]
+#itrain=mat[:1100,0]
+#for x in X:
+ #  print x
+model = LogisticRegression()
+rfe = RFE(model, 20)
+rfe = rfe.fit(Xtrain, ytrain)
+print(rfe.support_)
+print(rfe.ranking_)
+Xcv=mat[1100:,2:]
+ycv=f[1100:,1]
+p=int(0)
+n=int(0)
+pred=rfe.predict(Xcv)
+for x in pred:
+    if x==1:
+	p+=1
+    else:
+	n+=1
+print "Predicted pos %d neg %d" %(p,n)
+p=int(0)
+n=int(0)
+for x in ycv:
+    if x==1:
+	p+=1
+    else:
+	n+=1
+print "Actual pos %d neg %d" %(p,n)
+if "":
+	f=np.genfromtxt(open("CAX_COPD_TEST_data.csv","rb"),delimiter=",",skiprows=1)
+	mat=np.matrix(f)
+	Xtest=mat[:,2:]
+	p=int(0)
+	n=int(0)
+	pred=rfe.predict(Xtest)
+	for x in pred:
+	    if x==1:
+		p+=1
+	    else:
+		n+=1
+	print p,n
+	out=open("Copy.csv","wb")
+	writer=csv.writer(out)
+	for row in pred:
+	    writer.writerow([row])
+
